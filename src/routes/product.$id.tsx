@@ -52,7 +52,7 @@ function ProductPage() {
             <div className="mt-6">
               <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Color</div>
               <div className="flex gap-2">
-                {p.colors.map(c => (
+                {p.colors.map((c: string) => (
                   <button key={c} onClick={() => setColor(c)}
                     style={{ background: c }}
                     className={`w-9 h-9 rounded-full border-2 ${color === c ? "border-primary" : "border-border"}`} />

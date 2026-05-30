@@ -7,7 +7,7 @@ import { products } from "@/lib/products";
 export const Route = createFileRoute("/shop")({
   head: () => ({
     meta: [
-      { title: "Shop — The Twinz" },
+      { title: "Shop — Tha Twinz" },
       { name: "description", content: "Browse premium custom hoodies. Oversized, regular, and zip-up styles." },
     ],
   }),

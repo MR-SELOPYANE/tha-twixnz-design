@@ -72,9 +72,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "The Twinz — Custom Streetwear Hoodies" },
+      { title: "Tha Twinz — Custom Streetwear Hoodies" },
       { name: "description", content: "Design your own premium custom hoodies. Bold streetwear, made for the ones who stay different." },
-      { property: "og:title", content: "The Twinz — Custom. Unique. You." },
+      { property: "og:title", content: "Tha Twinz — Custom. Unique. You." },
       { property: "og:description", content: "Design your own premium custom hoodies." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

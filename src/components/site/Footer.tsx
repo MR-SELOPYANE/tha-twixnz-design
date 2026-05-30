@@ -5,7 +5,7 @@ export function Footer() {
     <footer className="border-t border-border mt-32">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 grid gap-10 md:grid-cols-4">
         <div>
-          <div className="font-display text-2xl tracking-wider mb-3">THE TWINZ</div>
+          <div className="font-display text-2xl tracking-wider mb-3">THA TWINZ</div>
           <p className="text-sm text-muted-foreground">Custom streetwear. Designed by you, built to last.</p>
         </div>
         <div>
@@ -33,7 +33,7 @@ export function Footer() {
         </div>
       </div>
       <div className="border-t border-border py-6 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} The Twinz. All rights reserved.
+        © {new Date().getFullYear()} Tha Twinz. All rights reserved.
       </div>
     </footer>
   );

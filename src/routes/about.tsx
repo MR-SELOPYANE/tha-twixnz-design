@@ -5,8 +5,8 @@ import { Leaf, Heart, Globe } from "lucide-react";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About — The Twinz" },
-      { name: "description", content: "The Twinz is a custom streetwear platform built for self-expression and sustainability." },
+      { title: "About — Tha Twinz" },
+      { name: "description", content: "Tha Twinz is a custom streetwear platform built for self-expression and sustainability." },
     ],
   }),
   component: About,
@@ -19,7 +19,7 @@ function About() {
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-24 text-center">
           <h1 className="font-display text-6xl sm:text-7xl">CUSTOM. UNIQUE. <span className="text-gradient">YOU.</span></h1>
           <p className="text-muted-foreground mt-6 text-lg max-w-2xl mx-auto">
-            The Twinz was built for the ones who refuse to look like everyone else.
+            Tha Twinz was built for the ones who refuse to look like everyone else.
             A studio in your pocket. A platform built for self-expression, made in Africa, shipped worldwide.
           </p>
         </div>

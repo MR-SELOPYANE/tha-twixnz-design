@@ -17,7 +17,7 @@ export function Header() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 font-display text-2xl tracking-wider">
           <span className="inline-block w-2 h-2 rounded-full bg-gradient-primary shadow-glow" />
-          THE TWINZ
+          THA TWINZ
         </Link>
         <nav className="hidden md:flex items-center gap-8 text-sm">
           {nav.map((n) => (

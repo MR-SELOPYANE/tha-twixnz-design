@@ -5,7 +5,7 @@ import { Trash2, Plus, Minus } from "lucide-react";
 import { useState } from "react";
 
 export const Route = createFileRoute("/cart")({
-  head: () => ({ meta: [{ title: "Cart — The Twinz" }] }),
+  head: () => ({ meta: [{ title: "Cart — Tha Twinz" }] }),
   component: Cart,
 });
 

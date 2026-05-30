@@ -9,7 +9,7 @@ import backMockup from "@/assets/hoodie-mockup-back.png";
 export const Route = createFileRoute("/customizer")({
   head: () => ({
     meta: [
-      { title: "Customizer — The Twinz" },
+      { title: "Customizer — Tha Twinz" },
       { name: "description", content: "Design your own custom hoodie. Add text, colors, graphics, and preview in real-time." },
     ],
   }),

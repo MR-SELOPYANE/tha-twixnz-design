@@ -6,7 +6,7 @@ import { Heart, MessageCircle, Trophy } from "lucide-react";
 export const Route = createFileRoute("/community")({
   head: () => ({
     meta: [
-      { title: "Community — The Twinz" },
+      { title: "Community — Tha Twinz" },
       { name: "description", content: "Designs from the Twinz community. Vote, remix, and get featured." },
     ],
   }),

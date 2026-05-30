@@ -9,7 +9,7 @@ import hero from "@/assets/hero-hoodie.jpg";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "The Twinz — Custom. Unique. You." },
+      { title: "Tha Twinz — Custom. Unique. You." },
       { name: "description", content: "Design your own premium streetwear hoodies. Bold, custom, made for the ones who stay different." },
     ],
   }),

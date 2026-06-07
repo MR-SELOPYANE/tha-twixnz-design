@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Layout } from "@/components/site/Layout";
 import { useRef, useState } from "react";
-import { motion } from "framer-motion";
 import {
   Type,
   Image as ImageIcon,
@@ -17,8 +16,8 @@ import {
   MoveHorizontal,
   Move,
 } from "lucide-react";
-import frontMockup from "@/assets/hoodie-mockup-front.png";
-import backMockup from "@/assets/hoodie-mockup-back.png";
+import { Hoodie3D, type Hoodie3DHandle } from "@/components/customizer/Hoodie3D";
+import { CUSTOM_FONTS, type FontKey } from "@/lib/fonts";
 
 export const Route = createFileRoute("/customizer")({
   head: () => ({

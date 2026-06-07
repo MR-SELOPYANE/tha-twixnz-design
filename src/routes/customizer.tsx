@@ -108,6 +108,17 @@ function Customizer() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const [quantity, setQuantity] = useState(1);
+  const [autoRotate, setAutoRotate] = useState(false);
+  const hoodieRef = useRef<Hoodie3DHandle>(null);
+
+  const exportHD = () => {
+    const url = hoodieRef.current?.exportHD();
+    if (!url) return;
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `tha-twinz-design-${Date.now()}.png`;
+    a.click();
+  };
 
   const textCharges = text ? 30 : 0;
   const imgCharges = uploadedImg ? 50 : 0;
@@ -134,12 +145,9 @@ function Customizer() {
       ? `0 0 18px ${textColor}`
       : "none";
 
-  // Show design overlay only when previewing the side that matches placement
-  const showOverlay =
-    (side === "front" && placement === "front") ||
-    (side === "back" && (placement === "back" || placement === "hood")) ||
-    placement === "left-sleeve" ||
-    placement === "right-sleeve";
+  // (side state unused with 3D preview; kept for compatibility)
+  void side;
+
 
   return (
     <Layout>

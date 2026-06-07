@@ -73,8 +73,11 @@ function AdminPage() {
                       name: "New Hoodie",
                       price: 699,
                       image: products[0].image,
-                      category: "Hoodies",
-                      tags: [],
+                      style: "Regular",
+                      colors: ["#000"],
+                      rating: 5,
+                      reviews: 0,
+                      description: "New product.",
                     },
                   ])
                 }
@@ -96,7 +99,7 @@ function AdminPage() {
                 {products.map((p) => (
                   <tr key={p.id} className="border-t border-border">
                     <td className="p-3">{p.name}</td>
-                    <td className="p-3 text-muted-foreground">{p.category}</td>
+                    <td className="p-3 text-muted-foreground">{p.style}</td>
                     <td className="p-3 text-right">R{p.price}</td>
                     <td className="p-3 text-right">
                       <button

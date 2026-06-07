@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { Search, User, ShoppingBag, Menu, X } from "lucide-react";
+import { Search, User, ShoppingBag, Menu, X, Sun, Moon, LayoutDashboard } from "lucide-react";
 import { useState } from "react";
+import { useTheme } from "./ThemeProvider";
 
 const nav = [
   { to: "/", label: "Home" },
@@ -12,6 +13,7 @@ const nav = [
 
 export function Header() {
   const [open, setOpen] = useState(false);
+  const { theme, toggle } = useTheme();
   return (
     <header className="sticky top-0 z-50 backdrop-blur-xl bg-background/70 border-b border-border">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -29,6 +31,10 @@ export function Header() {
         </nav>
         <div className="flex items-center gap-2">
           <button className="p-2 hover:bg-secondary rounded-md transition-colors" aria-label="Search"><Search className="w-5 h-5" /></button>
+          <button onClick={toggle} className="p-2 hover:bg-secondary rounded-md transition-colors" aria-label="Toggle theme">
+            {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          </button>
+          <Link to="/admin" className="p-2 hover:bg-secondary rounded-md transition-colors hidden sm:block" aria-label="Admin"><LayoutDashboard className="w-5 h-5" /></Link>
           <button className="p-2 hover:bg-secondary rounded-md transition-colors hidden sm:block" aria-label="Profile"><User className="w-5 h-5" /></button>
           <Link to="/cart" className="p-2 hover:bg-secondary rounded-md transition-colors relative" aria-label="Cart">
             <ShoppingBag className="w-5 h-5" />

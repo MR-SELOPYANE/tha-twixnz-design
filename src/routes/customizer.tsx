@@ -38,7 +38,6 @@ type Placement = "front" | "back" | "left-sleeve" | "right-sleeve" | "hood";
 type HoodieStyle = "Regular" | "Oversized" | "Zip-up" | "Cropped" | "Heavyweight";
 type Fabric = "Cotton 320gsm" | "Fleece 400gsm" | "French Terry" | "Organic Blend";
 type SizeOpt = "XS" | "S" | "M" | "L" | "XL" | "XXL";
-type FontKey = "Bebas Neue" | "Inter" | "Impact" | "Courier New" | "Georgia";
 type TextEffect = "none" | "outline" | "shadow" | "glow";
 
 const HOODIE_COLORS = [
@@ -73,7 +72,7 @@ const FABRIC_PRICE: Record<Fabric, number> = {
   "Organic Blend": 120,
 };
 
-const FONTS: FontKey[] = ["Bebas Neue", "Inter", "Impact", "Courier New", "Georgia"];
+const FONTS = CUSTOM_FONTS;
 const SIZES: SizeOpt[] = ["XS", "S", "M", "L", "XL", "XXL"];
 const PLACEMENTS: { key: Placement; label: string; icon: typeof Shirt }[] = [
   { key: "front", label: "Front", icon: Shirt },

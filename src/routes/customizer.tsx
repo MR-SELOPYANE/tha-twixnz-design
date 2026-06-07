@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Layout } from "@/components/site/Layout";
 import { useRef, useState } from "react";
-import { motion } from "framer-motion";
 import {
   Type,
   Image as ImageIcon,
@@ -17,8 +16,8 @@ import {
   MoveHorizontal,
   Move,
 } from "lucide-react";
-import frontMockup from "@/assets/hoodie-mockup-front.png";
-import backMockup from "@/assets/hoodie-mockup-back.png";
+import { Hoodie3D, type Hoodie3DHandle } from "@/components/customizer/Hoodie3D";
+import { CUSTOM_FONTS, type FontKey } from "@/lib/fonts";
 
 export const Route = createFileRoute("/customizer")({
   head: () => ({
@@ -39,7 +38,6 @@ type Placement = "front" | "back" | "left-sleeve" | "right-sleeve" | "hood";
 type HoodieStyle = "Regular" | "Oversized" | "Zip-up" | "Cropped" | "Heavyweight";
 type Fabric = "Cotton 320gsm" | "Fleece 400gsm" | "French Terry" | "Organic Blend";
 type SizeOpt = "XS" | "S" | "M" | "L" | "XL" | "XXL";
-type FontKey = "Bebas Neue" | "Inter" | "Impact" | "Courier New" | "Georgia";
 type TextEffect = "none" | "outline" | "shadow" | "glow";
 
 const HOODIE_COLORS = [
@@ -74,7 +72,7 @@ const FABRIC_PRICE: Record<Fabric, number> = {
   "Organic Blend": 120,
 };
 
-const FONTS: FontKey[] = ["Bebas Neue", "Inter", "Impact", "Courier New", "Georgia"];
+const FONTS = CUSTOM_FONTS;
 const SIZES: SizeOpt[] = ["XS", "S", "M", "L", "XL", "XXL"];
 const PLACEMENTS: { key: Placement; label: string; icon: typeof Shirt }[] = [
   { key: "front", label: "Front", icon: Shirt },
@@ -110,6 +108,17 @@ function Customizer() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const [quantity, setQuantity] = useState(1);
+  const [autoRotate, setAutoRotate] = useState(false);
+  const hoodieRef = useRef<Hoodie3DHandle>(null);
+
+  const exportHD = () => {
+    const url = hoodieRef.current?.exportHD();
+    if (!url) return;
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `tha-twinz-design-${Date.now()}.png`;
+    a.click();
+  };
 
   const textCharges = text ? 30 : 0;
   const imgCharges = uploadedImg ? 50 : 0;
@@ -136,12 +145,9 @@ function Customizer() {
       ? `0 0 18px ${textColor}`
       : "none";
 
-  // Show design overlay only when previewing the side that matches placement
-  const showOverlay =
-    (side === "front" && placement === "front") ||
-    (side === "back" && (placement === "back" || placement === "hood")) ||
-    placement === "left-sleeve" ||
-    placement === "right-sleeve";
+  // (side state unused with 3D preview; kept for compatibility)
+  void side;
+
 
   return (
     <Layout>
@@ -155,138 +161,62 @@ function Customizer() {
             <button className="border border-border px-4 py-2 rounded-md text-sm flex items-center gap-2 hover:bg-secondary">
               <Save className="w-4 h-4" /> Save
             </button>
-            <button className="bg-gradient-primary text-primary-foreground px-4 py-2 rounded-md text-sm flex items-center gap-2 shadow-glow">
+            <button
+              onClick={exportHD}
+              className="bg-gradient-primary text-primary-foreground px-4 py-2 rounded-md text-sm flex items-center gap-2 shadow-glow"
+            >
               <Download className="w-4 h-4" /> Export HD
             </button>
           </div>
         </div>
 
         <div className="grid lg:grid-cols-[1fr_380px] gap-6">
-          {/* Preview */}
-          <div className="bg-gradient-card border border-border rounded-2xl p-6 relative overflow-hidden min-h-[600px]">
-            <div className="absolute top-4 left-4 z-10 flex gap-1 bg-background/60 backdrop-blur p-1 rounded-lg border border-border">
-              {(["front", "back"] as Side[]).map((s) => (
+          {/* 3D Preview */}
+          <div className="bg-gradient-card border border-border rounded-2xl p-2 relative overflow-hidden min-h-[600px]">
+            <div className="absolute top-4 left-4 z-10 flex gap-1 bg-background/70 backdrop-blur p-1 rounded-lg border border-border">
+              {(["front", "side", "back"] as const).map((s) => (
                 <button
                   key={s}
-                  onClick={() => setSide(s)}
-                  className={`px-3 py-1 text-xs uppercase tracking-wider rounded ${
-                    side === s
-                      ? "bg-gradient-primary text-primary-foreground"
-                      : "text-muted-foreground"
-                  }`}
+                  onClick={() => setSide(s === "side" ? "front" : (s as Side))}
+                  className="px-3 py-1 text-xs uppercase tracking-wider rounded text-muted-foreground hover:text-foreground"
+                  title={`View ${s}`}
                 >
                   {s}
                 </button>
               ))}
             </div>
             <button
-              className="absolute top-4 right-4 z-10 p-2 bg-background/60 backdrop-blur border border-border rounded-lg"
-              title="360° (preview)"
+              onClick={() => setAutoRotate((r) => !r)}
+              className={`absolute top-4 right-4 z-10 p-2 backdrop-blur border border-border rounded-lg ${
+                autoRotate ? "bg-primary text-primary-foreground" : "bg-background/70"
+              }`}
+              title="360° auto-rotate"
             >
               <RotateCw className="w-4 h-4" />
             </button>
 
-            <div className="absolute inset-0 grid place-items-center">
-              <div className="absolute inset-0 bg-gradient-primary opacity-10 blur-3xl" />
-              <motion.div
-                key={side}
-                initial={{ opacity: 0, rotateY: -30 }}
-                animate={{ opacity: 1, rotateY: 0 }}
-                transition={{ duration: 0.5 }}
-                className="relative w-full max-w-md aspect-square"
-                style={{ perspective: 1000 }}
-              >
-                {/* Hoodie tinted */}
-                <div
-                  className="absolute inset-0"
-                  style={{ filter: `drop-shadow(0 30px 60px rgba(0,0,0,0.5))` }}
-                >
-                  <div
-                    className="relative w-full h-full"
-                    style={{
-                      backgroundColor: hoodieColor,
-                      maskImage: `url(${side === "front" ? frontMockup : backMockup})`,
-                      WebkitMaskImage: `url(${side === "front" ? frontMockup : backMockup})`,
-                      maskSize: "contain",
-                      WebkitMaskSize: "contain",
-                      maskRepeat: "no-repeat",
-                      WebkitMaskRepeat: "no-repeat",
-                      maskPosition: "center",
-                      WebkitMaskPosition: "center",
-                    }}
-                  />
-                </div>
-
-                {/* Drawstring accent (front only) */}
-                {side === "front" && (
-                  <div
-                    className="absolute left-1/2 -translate-x-1/2 top-[18%] w-[18%] h-1 rounded-full opacity-80"
-                    style={{ backgroundColor: drawstringColor }}
-                  />
-                )}
-
-                {/* Design overlay */}
-                {showOverlay && (
-                  <div className="absolute inset-0 grid place-items-center pointer-events-none">
-                    <div
-                      className="relative"
-                      style={{
-                        width:
-                          placement === "left-sleeve" || placement === "right-sleeve"
-                            ? "18%"
-                            : placement === "hood"
-                            ? "30%"
-                            : "55%",
-                        height:
-                          placement === "left-sleeve" || placement === "right-sleeve"
-                            ? "15%"
-                            : placement === "hood"
-                            ? "20%"
-                            : "45%",
-                        transform: `translate(${
-                          placement === "left-sleeve"
-                            ? "-140%"
-                            : placement === "right-sleeve"
-                            ? "140%"
-                            : "0%"
-                        }, ${placement === "hood" ? "-110%" : "0%"})`,
-                      }}
-                    >
-                      {uploadedImg && (
-                        <img
-                          src={uploadedImg}
-                          alt=""
-                          className="absolute inset-0 w-full h-full object-contain"
-                          style={{
-                            opacity: imgOpacity / 100,
-                            transform: `scale(${imgScale / 100}) rotate(${imgRotation}deg)`,
-                          }}
-                        />
-                      )}
-                      {text && (
-                        <div
-                          className="absolute inset-0 grid place-items-center text-center leading-none whitespace-pre-line"
-                          style={{
-                            color: textColor,
-                            fontSize: textSize,
-                            fontFamily: font,
-                            transform: `translate(${textX}px, ${textY}px) rotate(${textRotation}deg)`,
-                            textShadow,
-                          }}
-                        >
-                          {text}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </motion.div>
+            <div className="absolute inset-0">
+              <Hoodie3D
+                ref={hoodieRef}
+                color={hoodieColor}
+                drawstringColor={drawstringColor}
+                text={text}
+                textColor={textColor}
+                font={font}
+                textSize={textSize}
+                image={uploadedImg}
+                imageOpacity={imgOpacity}
+                placement={placement}
+                autoRotate={autoRotate}
+                style={style}
+              />
             </div>
 
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-background/70 backdrop-blur border border-border rounded-full px-4 py-2 text-xs text-muted-foreground">
-              {style} · {fabric} · Size {sizeOpt} · {placement.replace("-", " ")}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-background/70 backdrop-blur border border-border rounded-full px-4 py-2 text-xs text-muted-foreground pointer-events-none">
+              {style} · {fabric} · Size {sizeOpt} · {placement.replace("-", " ")} · drag to rotate
             </div>
           </div>
+
 
           {/* Controls */}
           <div className="bg-gradient-card border border-border rounded-2xl p-5 space-y-6 overflow-y-auto max-h-[80vh]">

@@ -271,12 +271,12 @@ export const Hoodie3D = forwardRef<Hoodie3DHandle, Hoodie3DProps>(function Hoodi
       shadows
       dpr={[1, 2]}
       camera={{ position: [0, 0.5, 5], fov: 35 }}
-      gl={{ preserveDrawingBuffer: true, antialias: true }}
+      gl={{ preserveDrawingBuffer: true, antialias: true, alpha: true }}
+      style={{ background: "transparent" }}
     >
-      <color attach="background" args={["#00000000"]} />
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[3, 5, 4]} intensity={1.1} castShadow shadow-mapSize={[1024, 1024]} />
-      <directionalLight position={[-4, 2, -2]} intensity={0.4} />
+      <ambientLight intensity={0.7} />
+      <directionalLight position={[3, 5, 4]} intensity={1.2} castShadow shadow-mapSize={[1024, 1024]} />
+      <directionalLight position={[-4, 2, -2]} intensity={0.5} />
       <Suspense fallback={null}>
         <Hoodie props={props} />
         <Environment preset="city" />

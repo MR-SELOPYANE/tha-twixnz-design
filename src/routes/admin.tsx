@@ -5,7 +5,16 @@ import { products as seedProducts } from "@/lib/products";
 import { Check, X, Trash2, Plus } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
-  head: () => ({ meta: [{ title: "Admin — Tha Twinz" }] }),
+  head: () => ({
+    meta: [
+      { title: "Store Admin — THA TWINZ" },
+      { name: "description", content: "Manage THA TWINZ products, order statuses, and community design reviews." },
+      { property: "og:title", content: "Store Admin — THA TWINZ" },
+      { property: "og:description", content: "Manage store products, orders, and community submissions." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: AdminPage,
 });
 

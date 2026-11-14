@@ -13,8 +13,12 @@ export const Route = createFileRoute("/product/$id")({
   },
   head: ({ loaderData }) => ({
     meta: [
-      { title: loaderData ? `${loaderData.name} — Tha Twinz` : "Product" },
-      { name: "description", content: loaderData?.description ?? "" },
+      { title: loaderData ? `${loaderData.name} — THA TWINZ` : "THA TWINZ Hoodie" },
+      { name: "description", content: loaderData?.description ?? "Explore a custom-ready THA TWINZ streetwear hoodie." },
+      { property: "og:title", content: loaderData ? `${loaderData.name} — THA TWINZ` : "THA TWINZ Hoodie" },
+      { property: "og:description", content: loaderData?.description ?? "Explore a custom-ready THA TWINZ streetwear hoodie." },
+      { property: "og:type", content: "product" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   notFoundComponent: () => (

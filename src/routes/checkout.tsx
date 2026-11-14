@@ -3,7 +3,16 @@ import { Layout } from "@/components/site/Layout";
 import { Lock } from "lucide-react";
 
 export const Route = createFileRoute("/checkout")({
-  head: () => ({ meta: [{ title: "Checkout — Tha Twinz" }] }),
+  head: () => ({
+    meta: [
+      { title: "Checkout — THA TWINZ" },
+      { name: "description", content: "Complete your THA TWINZ hoodie order with shipping and payment details." },
+      { property: "og:title", content: "Checkout — THA TWINZ" },
+      { property: "og:description", content: "Finish your custom streetwear order with THA TWINZ." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: Checkout,
 });
 

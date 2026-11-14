@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Layout } from "@/components/site/Layout";
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Type,
   Image as ImageIcon,
@@ -15,19 +15,30 @@ import {
   Crown,
   MoveHorizontal,
   Move,
+  Undo2,
+  Redo2,
 } from "lucide-react";
 import { Hoodie3D, type Hoodie3DHandle } from "@/components/customizer/Hoodie3D";
 import { CUSTOM_FONTS, type FontKey } from "@/lib/fonts";
+import { Button } from "@/components/ui/button";
+import { pushHistorySnapshot, redoHistory, undoHistory } from "@/lib/design-history";
 
 export const Route = createFileRoute("/customizer")({
   head: () => ({
     meta: [
-      { title: "Customizer — Tha Twinz" },
+      { title: "Custom Hoodie Designer — THA TWINZ" },
       {
         name: "description",
         content:
-          "Design your own custom hoodie. Add text, colors, graphics, and preview in real-time.",
+          "Design a THA TWINZ hoodie with custom colors, fabrics, fit, text, graphics, and a live 3D preview.",
       },
+      { property: "og:title", content: "Custom Hoodie Designer — THA TWINZ" },
+      {
+        property: "og:description",
+        content: "Customize your hoodie and preview every detail in 3D.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Customizer,
@@ -82,32 +93,172 @@ const PLACEMENTS: { key: Placement; label: string; icon: typeof Shirt }[] = [
   { key: "hood", label: "Hood", icon: Crown },
 ];
 
+type HoodieDesign = {
+  style: HoodieStyle;
+  fabric: Fabric;
+  sizeOpt: SizeOpt;
+  hoodieColor: string;
+  drawstringColor: string;
+  placement: Placement;
+  text: string;
+  textColor: string;
+  textSize: number;
+  textRotation: number;
+  font: FontKey;
+  textEffect: TextEffect;
+  textX: number;
+  textY: number;
+  uploadedImg: string | null;
+  imgScale: number;
+  imgRotation: number;
+  imgOpacity: number;
+  quantity: number;
+};
+
+const MAX_HISTORY = 50;
+
+function useDesignHistory(initialDesign: HoodieDesign) {
+  const [design, setDesign] = useState(initialDesign);
+  const designRef = useRef(design);
+  const undoStack = useRef<HoodieDesign[]>([]);
+  const redoStack = useRef<HoodieDesign[]>([]);
+  const pendingBefore = useRef<HoodieDesign | null>(null);
+  const timeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const flushPending = useCallback(() => {
+    if (timeout.current) clearTimeout(timeout.current);
+    timeout.current = null;
+    if (!pendingBefore.current) return;
+    undoStack.current = pushHistorySnapshot(undoStack.current, pendingBefore.current, MAX_HISTORY);
+    pendingBefore.current = null;
+  }, []);
+
+  useEffect(
+    () => () => {
+      if (timeout.current) clearTimeout(timeout.current);
+    },
+    [],
+  );
+
+  const update = useCallback(
+    <Key extends keyof HoodieDesign>(key: Key, value: HoodieDesign[Key]) => {
+      if (Object.is(designRef.current[key], value)) return;
+      if (!pendingBefore.current) pendingBefore.current = designRef.current;
+      redoStack.current = [];
+      const nextDesign = { ...designRef.current, [key]: value };
+      designRef.current = nextDesign;
+      setDesign(nextDesign);
+      if (timeout.current) clearTimeout(timeout.current);
+      timeout.current = setTimeout(flushPending, 300);
+    },
+    [flushPending],
+  );
+
+  const undo = useCallback(() => {
+    flushPending();
+    const transition = undoHistory(
+      designRef.current,
+      undoStack.current,
+      redoStack.current,
+      MAX_HISTORY,
+    );
+    if (!transition) return;
+    undoStack.current = transition.undo;
+    redoStack.current = transition.redo;
+    designRef.current = transition.current;
+    setDesign(transition.current);
+  }, [flushPending]);
+
+  const redo = useCallback(() => {
+    flushPending();
+    const transition = redoHistory(
+      designRef.current,
+      undoStack.current,
+      redoStack.current,
+      MAX_HISTORY,
+    );
+    if (!transition) return;
+    undoStack.current = transition.undo;
+    redoStack.current = transition.redo;
+    designRef.current = transition.current;
+    setDesign(transition.current);
+  }, [flushPending]);
+
+  return {
+    design,
+    update,
+    undo,
+    redo,
+    canUndo: pendingBefore.current !== null || undoStack.current.length > 0,
+    canRedo: redoStack.current.length > 0,
+  };
+}
+
 function Customizer() {
   const [side, setSide] = useState<Side>("front");
-  const [style, setStyle] = useState<HoodieStyle>("Oversized");
-  const [fabric, setFabric] = useState<Fabric>("Cotton 320gsm");
-  const [sizeOpt, setSizeOpt] = useState<SizeOpt>("M");
-  const [hoodieColor, setHoodieColor] = useState("#0a0a0a");
-  const [drawstringColor, setDrawstringColor] = useState("#ffffff");
-
-  const [placement, setPlacement] = useState<Placement>("front");
-
-  const [text, setText] = useState("DREAM\nCREATE\nINSPIRE");
-  const [textColor, setTextColor] = useState("#7c3aed");
-  const [textSize, setTextSize] = useState(48);
-  const [textRotation, setTextRotation] = useState(0);
-  const [font, setFont] = useState<FontKey>("Bebas Neue");
-  const [textEffect, setTextEffect] = useState<TextEffect>("none");
-  const [textX, setTextX] = useState(0);
-  const [textY, setTextY] = useState(0);
-
-  const [uploadedImg, setUploadedImg] = useState<string | null>(null);
-  const [imgScale, setImgScale] = useState(100);
-  const [imgRotation, setImgRotation] = useState(0);
-  const [imgOpacity, setImgOpacity] = useState(90);
+  const history = useDesignHistory({
+    style: "Oversized",
+    fabric: "Cotton 320gsm",
+    sizeOpt: "M",
+    hoodieColor: "#0a0a0a",
+    drawstringColor: "#ffffff",
+    placement: "front",
+    text: "DREAM\nCREATE\nINSPIRE",
+    textColor: "#7c3aed",
+    textSize: 48,
+    textRotation: 0,
+    font: "Bebas Neue",
+    textEffect: "none",
+    textX: 0,
+    textY: 0,
+    uploadedImg: null,
+    imgScale: 100,
+    imgRotation: 0,
+    imgOpacity: 90,
+    quantity: 1,
+  });
+  const {
+    style,
+    fabric,
+    sizeOpt,
+    hoodieColor,
+    drawstringColor,
+    placement,
+    text,
+    textColor,
+    textSize,
+    textRotation,
+    font,
+    textEffect,
+    textX,
+    textY,
+    uploadedImg,
+    imgScale,
+    imgRotation,
+    imgOpacity,
+    quantity,
+  } = history.design;
+  const setStyle = (value: HoodieStyle) => history.update("style", value);
+  const setFabric = (value: Fabric) => history.update("fabric", value);
+  const setSizeOpt = (value: SizeOpt) => history.update("sizeOpt", value);
+  const setHoodieColor = (value: string) => history.update("hoodieColor", value);
+  const setDrawstringColor = (value: string) => history.update("drawstringColor", value);
+  const setPlacement = (value: Placement) => history.update("placement", value);
+  const setText = (value: string) => history.update("text", value);
+  const setTextColor = (value: string) => history.update("textColor", value);
+  const setTextSize = (value: number) => history.update("textSize", value);
+  const setTextRotation = (value: number) => history.update("textRotation", value);
+  const setFont = (value: FontKey) => history.update("font", value);
+  const setTextEffect = (value: TextEffect) => history.update("textEffect", value);
+  const setTextX = (value: number) => history.update("textX", value);
+  const setTextY = (value: number) => history.update("textY", value);
+  const setUploadedImg = (value: string | null) => history.update("uploadedImg", value);
+  const setImgScale = (value: number) => history.update("imgScale", value);
+  const setImgRotation = (value: number) => history.update("imgRotation", value);
+  const setImgOpacity = (value: number) => history.update("imgOpacity", value);
+  const setQuantity = (value: number) => history.update("quantity", value);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const [quantity, setQuantity] = useState(1);
   const [autoRotate, setAutoRotate] = useState(false);
   const hoodieRef = useRef<Hoodie3DHandle>(null);
 
@@ -158,6 +309,28 @@ function Customizer() {
             <p className="text-sm text-muted-foreground">Design your one-of-one.</p>
           </div>
           <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={history.undo}
+              disabled={!history.canUndo}
+              aria-label="Undo last design change"
+              title="Undo last design change"
+            >
+              <Undo2 />
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={history.redo}
+              disabled={!history.canRedo}
+              aria-label="Redo design change"
+              title="Redo design change"
+            >
+              <Redo2 />
+            </Button>
             <button className="border border-border px-4 py-2 rounded-md text-sm flex items-center gap-2 hover:bg-secondary">
               <Save className="w-4 h-4" /> Save
             </button>

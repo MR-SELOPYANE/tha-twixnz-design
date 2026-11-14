@@ -9,8 +9,12 @@ import hero from "@/assets/hero-hoodie.jpg";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Tha Twinz — Custom. Unique. You." },
-      { name: "description", content: "Design your own premium streetwear hoodies. Bold, custom, made for the ones who stay different." },
+      { title: "THA TWINZ — Custom Streetwear Hoodies" },
+      { name: "description", content: "Design premium THA TWINZ streetwear hoodies with bold colors, custom graphics, and a live 3D preview." },
+      { property: "og:title", content: "THA TWINZ — Custom Streetwear Hoodies" },
+      { property: "og:description", content: "Design premium streetwear hoodies made for the ones who stay different." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Home,

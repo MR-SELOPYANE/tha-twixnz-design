@@ -5,8 +5,12 @@ import { Leaf, Heart, Globe } from "lucide-react";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About — Tha Twinz" },
-      { name: "description", content: "Tha Twinz is a custom streetwear platform built for self-expression and sustainability." },
+      { title: "About THA TWINZ — Custom Streetwear" },
+      { name: "description", content: "Meet THA TWINZ, a custom streetwear brand built around self-expression, durable hoodies, and thoughtful production." },
+      { property: "og:title", content: "About THA TWINZ — Custom Streetwear" },
+      { property: "og:description", content: "A streetwear studio for self-expression, made to outlast trends." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: About,

@@ -6,8 +6,12 @@ import { Heart, MessageCircle, Trophy } from "lucide-react";
 export const Route = createFileRoute("/community")({
   head: () => ({
     meta: [
-      { title: "Community — Tha Twinz" },
-      { name: "description", content: "Designs from the Twinz community. Vote, remix, and get featured." },
+      { title: "THA TWINZ Community Designs" },
+      { name: "description", content: "Explore streetwear designs from the THA TWINZ community and discover featured hoodie remixes." },
+      { property: "og:title", content: "THA TWINZ Community Designs" },
+      { property: "og:description", content: "Discover bold hoodie designs made by the THA TWINZ community." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Community,

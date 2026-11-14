@@ -7,8 +7,12 @@ import { products } from "@/lib/products";
 export const Route = createFileRoute("/shop")({
   head: () => ({
     meta: [
-      { title: "Shop — Tha Twinz" },
-      { name: "description", content: "Browse premium custom hoodies. Oversized, regular, and zip-up styles." },
+      { title: "Shop THA TWINZ Hoodies" },
+      { name: "description", content: "Shop custom-ready THA TWINZ hoodies in oversized, regular, and zip-up fits." },
+      { property: "og:title", content: "Shop THA TWINZ Hoodies" },
+      { property: "og:description", content: "Explore custom-ready streetwear hoodies in standout fits and styles." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Shop,

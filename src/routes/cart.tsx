@@ -5,7 +5,16 @@ import { Trash2, Plus, Minus } from "lucide-react";
 import { useState } from "react";
 
 export const Route = createFileRoute("/cart")({
-  head: () => ({ meta: [{ title: "Cart — Tha Twinz" }] }),
+  head: () => ({
+    meta: [
+      { title: "Your Cart — THA TWINZ" },
+      { name: "description", content: "Review your THA TWINZ hoodie selections, quantities, and delivery total." },
+      { property: "og:title", content: "Your Cart — THA TWINZ" },
+      { property: "og:description", content: "Review your selected THA TWINZ streetwear before checkout." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: Cart,
 });
 

@@ -8,6 +8,10 @@ export function pushHistorySnapshot<T>(stack: T[], snapshot: T, limit = 50): T[]
   return [...stack, snapshot].slice(-limit);
 }
 
+export function clearRedoHistory<T>(_redo: T[]): T[] {
+  return [];
+}
+
 export function undoHistory<T>(
   current: T,
   undo: T[],

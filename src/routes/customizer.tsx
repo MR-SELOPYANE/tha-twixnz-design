@@ -21,7 +21,12 @@ import {
 import { Hoodie3D, type Hoodie3DHandle } from "@/components/customizer/Hoodie3D";
 import { CUSTOM_FONTS, type FontKey } from "@/lib/fonts";
 import { Button } from "@/components/ui/button";
-import { pushHistorySnapshot, redoHistory, undoHistory } from "@/lib/design-history";
+import {
+  clearRedoHistory,
+  pushHistorySnapshot,
+  redoHistory,
+  undoHistory,
+} from "@/lib/design-history";
 
 export const Route = createFileRoute("/customizer")({
   head: () => ({
@@ -119,6 +124,8 @@ const MAX_HISTORY = 50;
 
 function useDesignHistory(initialDesign: HoodieDesign) {
   const [design, setDesign] = useState(initialDesign);
+  const [canUndo, setCanUndo] = useState(false);
+  const [canRedo, setCanRedo] = useState(false);
   const designRef = useRef(design);
   const undoStack = useRef<HoodieDesign[]>([]);
   const redoStack = useRef<HoodieDesign[]>([]);
@@ -144,10 +151,12 @@ function useDesignHistory(initialDesign: HoodieDesign) {
     <Key extends keyof HoodieDesign>(key: Key, value: HoodieDesign[Key]) => {
       if (Object.is(designRef.current[key], value)) return;
       if (!pendingBefore.current) pendingBefore.current = designRef.current;
-      redoStack.current = [];
+      redoStack.current = clearRedoHistory(redoStack.current);
       const nextDesign = { ...designRef.current, [key]: value };
       designRef.current = nextDesign;
       setDesign(nextDesign);
+      setCanUndo(true);
+      setCanRedo(false);
       if (timeout.current) clearTimeout(timeout.current);
       timeout.current = setTimeout(flushPending, 300);
     },
@@ -167,6 +176,8 @@ function useDesignHistory(initialDesign: HoodieDesign) {
     redoStack.current = transition.redo;
     designRef.current = transition.current;
     setDesign(transition.current);
+    setCanUndo(transition.undo.length > 0);
+    setCanRedo(transition.redo.length > 0);
   }, [flushPending]);
 
   const redo = useCallback(() => {
@@ -182,6 +193,8 @@ function useDesignHistory(initialDesign: HoodieDesign) {
     redoStack.current = transition.redo;
     designRef.current = transition.current;
     setDesign(transition.current);
+    setCanUndo(transition.undo.length > 0);
+    setCanRedo(transition.redo.length > 0);
   }, [flushPending]);
 
   return {
@@ -189,8 +202,8 @@ function useDesignHistory(initialDesign: HoodieDesign) {
     update,
     undo,
     redo,
-    canUndo: pendingBefore.current !== null || undoStack.current.length > 0,
-    canRedo: redoStack.current.length > 0,
+    canUndo,
+    canRedo,
   };
 }
 
@@ -238,6 +251,28 @@ function Customizer() {
     imgOpacity,
     quantity,
   } = history.design;
+  useEffect(() => {
+    const handleHistoryShortcut = (event: KeyboardEvent) => {
+      if (!(event.metaKey || event.ctrlKey) || event.altKey) return;
+      const target = event.target;
+      if (
+        target instanceof HTMLElement &&
+        (target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName))
+      ) {
+        return;
+      }
+      if (event.key.toLowerCase() === "z") {
+        event.preventDefault();
+        if (event.shiftKey) history.redo();
+        else history.undo();
+      } else if (event.key.toLowerCase() === "y") {
+        event.preventDefault();
+        history.redo();
+      }
+    };
+    window.addEventListener("keydown", handleHistoryShortcut);
+    return () => window.removeEventListener("keydown", handleHistoryShortcut);
+  }, [history.redo, history.undo]);
   const setStyle = (value: HoodieStyle) => history.update("style", value);
   const setFabric = (value: Fabric) => history.update("fabric", value);
   const setSizeOpt = (value: SizeOpt) => history.update("sizeOpt", value);
@@ -314,7 +349,6 @@ function Customizer() {
               variant="outline"
               size="icon"
               onClick={history.undo}
-              disabled={!history.canUndo}
               aria-label="Undo last design change"
               title="Undo last design change"
             >
@@ -325,7 +359,6 @@ function Customizer() {
               variant="outline"
               size="icon"
               onClick={history.redo}
-              disabled={!history.canRedo}
               aria-label="Redo design change"
               title="Redo design change"
             >

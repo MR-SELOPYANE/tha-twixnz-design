@@ -17,6 +17,17 @@ describe("design history", () => {
     });
   });
 
+  it("undoes and redoes a hoodie fit selection", () => {
+    const changed = "Regular";
+    const previous = "Oversized";
+    const undone = undoHistory(changed, [previous], [], 50);
+
+    expect(undone?.current).toBe("Oversized");
+    expect(undone && redoHistory(undone.current, undone.undo, undone.redo, 50)?.current).toBe(
+      "Regular",
+    );
+  });
+
   it("clears redo when a new edit is made after undo", () => {
     const undone = undoHistory("blue hoodie", ["black hoodie"], [], 50);
     expect(undone).not.toBeNull();

@@ -349,6 +349,7 @@ function Customizer() {
               variant="outline"
               size="icon"
               onClick={history.undo}
+              disabled={!history.canUndo}
               aria-label="Undo last design change"
               title="Undo last design change"
             >
@@ -359,6 +360,7 @@ function Customizer() {
               variant="outline"
               size="icon"
               onClick={history.redo}
+              disabled={!history.canRedo}
               aria-label="Redo design change"
               title="Redo design change"
             >
